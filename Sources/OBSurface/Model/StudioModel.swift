@@ -10,9 +10,16 @@
 import Foundation
 import SwiftUI  // FIXME: remove when AppStorage for managedScene is clarified
 
+#if compiler(<6)
+import Combine
+#else
+// FIXME: review Combine publishers for Sendable
+// It is not clear if Combine structures CurrentValueSubject and PassthroughSubject are Sendable.
+@preconcurrency import Combine
+#endif
+
 import OBSAsyncAPI
 import OBSWebsocket
-import Combine
 
 @MainActor
 class StudioModel: ObservableObject {
@@ -441,7 +448,7 @@ class StudioModel: ObservableObject {
 }
 
 
-public struct OBSScene: Identifiable, Hashable, Equatable {
+public struct OBSScene: Identifiable, Hashable, Equatable, Sendable {
     public typealias ID = Int
     public var id: Int {
         return name.hash
